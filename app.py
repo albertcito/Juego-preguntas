@@ -2,6 +2,7 @@ from flask import Flask, redirect, url_for,request, Response,render_template,ses
 from flask import jsonify 
 import hashlib
 import sys,pprint
+import random
 import sqlite3
 
 app = Flask(__name__)
@@ -81,13 +82,72 @@ def _verificar_respuesta():
     etapa = request.args.get('etapa')
     c = getCursor();
     result = c.execute("""
-        select count(*) from preguntas where respuesta_correcta=? """, 
-        [respuesta]
+        select 
+            count(*)
+        from 
+            preguntas p, 
+            etapa e 
+        where 
+            p.respuesta_correcta=? AND 
+            p.etapa_nombre_etapa= e.nombre_etapa AND
+            e.no_etapa = ?
+        """, 
+        [respuesta,etapa]
     )
     res = result.fetchone()
+
+    resultado = [(res[0])]
     
-    
-    return jsonify(result=res)
+    if( res[0] == 1):
+        e = int(etapa)+1
+        result2 = c.execute("""
+            select 
+                *
+            from 
+                etapa e 
+            where 
+                e.no_etapa = ?
+            """, 
+            [e]
+        )
+        resu = result2.fetchone()
+        if resu :
+            resultado.append(resu)
+            result3 = c.execute("""
+                select 
+                    p.pregunta,
+                    p.id_pregunta,
+                    p.respuesta_correcta
+                from 
+                    preguntas p,
+                    etapa e 
+                where 
+                    p.etapa_nombre_etapa= e.nombre_etapa AND
+                    e.nombre_etapa = ?
+                limit 1 
+                """, 
+                [resu[0]]
+            )
+            pregunta_ = result3.fetchone()
+            resultado.append(pregunta_[0])
+
+            result4 = c.execute("""
+                select 
+                    respuesta 
+                from 
+                    alternativa 
+                where 
+                    preguntas_id_pregunta=? 
+                limit 3
+                """, 
+                [pregunta_[1]]
+            )
+            alternativa = result4.fetchall()
+            alternativa.append([pregunta_[2]])
+            random.shuffle(alternativa)
+            resultado.append(alternativa)
+
+    return jsonify(result=resultado)
 
 
 if __name__ == '__main__':
