@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block head %}
+{{ super() }}
+{% endblock head %}
+
+{% block content %}
+
+	<div class="col-md-9">
+
+		<h1 id="pregunta">
+		{{pregunta[1]}}
+		</h1>
+		<div id="respuestas">
+			
+			<a href="javascrip:;" class="btn btn-warning">
+				{{ alternativa[1][1] }}
+			</a>
+			<a href="javascrip:;" class="btn btn-info">
+				{{ alternativa[0][1] }}
+			</a>
+			<a  href="javascrip:;" class="btn btn-success">
+				{{ alternativa[1][1] }}
+			</a>
+			<a  href="javascrip:;" class="btn btn-primary">
+				{{ pregunta[2] }}
+			</a>
+			
+			
+		</div>
+
+	</div>
+	<div class="col-md-3">
+		<ul class="list-group" id="etapa">
+			{% for e in etapa %}
+				<li id="e_{{ e[1] }}" class="list-group-item {% if e[1] == 5000 %} active {% endif %}">
+					<h4 class="list-group-item-heading">{{ e[0] }}</h4>
+					<p class="list-group-item-text">{{ e[1] }}</p>
+				</li>
+			{% endfor %}
+		</ul>
+	</div>
+
+
+
+
+{% endblock content %}

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+	{% block head %}
+	{{ super() }}
+	{% endblock head %}
+
+	{% block content %}
+		<div>
+
+			<table>
+				<thead>
+					<tr>
+						<th>Username</th>
+						<th>Clave</th>
+						<th>Salt</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for usuario in usuarios %}
+				  		<tr>
+						<td>{{ usuario[0] }}</td>
+						<td>{{ usuario[1] }}</td>
+						<td>{{ usuario[2] }}</td>
+					</tr>
+					{% endfor %}
+					
+				</tbody>
+			</table>
+	    </div>
+	{% endblock content %}
