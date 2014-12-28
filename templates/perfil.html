@@ -5,20 +5,19 @@
 
 	{% block content %}
 		<div>
+			<h1>Mis Participaciones</h1>
 
-			<table>
+			<table class="table">
 				<thead>
 					<tr>
-						<th>Username</th>
-						<th>Clave</th>
-						<th>Salt</th>
+						<th>Fecha</th>
+						<th>Resultado</th>
 					</tr>
 				</thead>
 				<tbody>
-					{% for usuario in usuarios %}
+					{% for usuario in participacion %}
 				  		<tr>
 						<td>{{ usuario[0] }}</td>
-						<td>{{ usuario[1] }}</td>
 						<td>{{ usuario[2] }}</td>
 					</tr>
 					{% endfor %}

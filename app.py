@@ -45,7 +45,7 @@ def index():
                 session['email'] = email
                 session['nombre'] = matches[3]
 
-                return redirect('usuarios')
+                return redirect('perfil')
             else:
                 error = "Clave erronea."
         else:
@@ -53,13 +53,14 @@ def index():
 
     return render_template('login.html',error=error)
 
-@app.route('/usuarios' )
+@app.route('/perfil' )
 def form():
     if 'email' not in session: return redirect('')
-    
+    email = session['email']
     c = getCursor(getConexion());
-    usuarios = c.execute('select * from usuario')
-    return render_template('usuarios.html',usuarios=usuarios,usuario = session['nombre'])
+    participacion = c.execute('select * from participacion WHERE usuario_email=? order by fecha DESC',[email])
+    return render_template('perfil.html',participacion=participacion,usuario = session['nombre'])
+
 
 @app.route('/salir')
 def salir():
@@ -83,6 +84,18 @@ def jugar():
 
     return render_template('jugar.html',pregunta=pregunta,alternativa=alternativa,etapa=etapa,usuario = session['nombre'])
 
+@app.route('/perdio')
+def perdio():
+    if 'email' not in session: return redirect('')
+    etapa = request.args.get('etapa')
+    return render_template('perdio.html',usuario = session['nombre'])
+
+@app.route('/gano')
+def gano():
+    if 'email' not in session: return redirect('')
+    return render_template('gano.html',usuario = session['nombre'])
+
+
 @app.route('/_verificar_respuesta')
 def _verificar_respuesta():
     respuesta = request.args.get('respuesta')
@@ -105,12 +118,13 @@ def _verificar_respuesta():
     res = result.fetchone()
     
     #return jsonify(result=res)
-    
-    resultado = [(res[0])]
+    resultado = {}
+    resultado["error"] = [(res[0])]
     
     #Si respondió bien la pregunta
     if( res[0] == 1):
 
+        #buscar etapa actual 
         result_etapa = c.execute("""
             select 
                 nombre_etapa
@@ -122,23 +136,40 @@ def _verificar_respuesta():
             etapa
         )
         res_etapa = result_etapa.fetchone()
+        #Si la etapa es la primera se inserta, si no se actualiza
+        if primera == res_etapa[0]:
+            insertParticipacion = """
+            INSERT INTO participacion ('fecha', 'usuario_email','etapa_nombre_etapa')
+            VALUES (?, ?, ?)""";
+            session['now'] = time.strftime("%d/%m/%y %H:%M:%S")
+            c.execute(
+                insertParticipacion,
+                (
+                    session['now'],
+                    session['email'],
+                    res_etapa[0]
+                )
+            );
+            conn.commit()
+        else: 
+            actualizarParticipacion = """
+                UPDATE participacion
+                SET etapa_nombre_etapa= ?
+                WHERE 
+                    usuario_email=? AND
+                    fecha = ?;
+            """
+            c.execute(
+                actualizarParticipacion,
+                (
+                    res_etapa[0],
+                    session['email'],
+                    session['now']
+                )
+            );
+            conn.commit()
 
-        insertParticipacion = """
-        INSERT INTO participacion ('fecha', 'usuario_email','etapa_nombre_etapa')
-        VALUES (?, ?, ?)""";
-        now = datetime.datetime.now()
-        ahora = time.strftime("%d/%m/%y %H:%M:%S")
-        c.execute(
-            insertParticipacion,
-            (
-                ahora,
-                session['email'],
-                res_etapa[0]
-            )
-        );
-        conn.commit()
-
-
+        #Se busca la siguiente etapa
         e = int(etapa)+1
         result2 = c.execute("""
             select 
@@ -151,8 +182,9 @@ def _verificar_respuesta():
             [e]
         )
         resu = result2.fetchone()
+        #Si hay una siguiente etapa se buscan las pregunta sy respustas
         if resu :
-            resultado.append(resu)
+            resultado["etapa"] = resu
             result3 = c.execute("""
                 select 
                     p.pregunta,
@@ -170,7 +202,7 @@ def _verificar_respuesta():
                 [resu[0]]
             )
             pregunta_ = result3.fetchone()
-            resultado.append(pregunta_[0])
+            resultado["pregunta"] = pregunta_[0]
 
             result4 = c.execute("""
                 select 
@@ -186,9 +218,10 @@ def _verificar_respuesta():
             alternativa = result4.fetchall()
             alternativa.append([pregunta_[2]])
             random.shuffle(alternativa)
-            resultado.append(alternativa)
-
-    return jsonify(result=resultado)
+            resultado['alternativas'] = alternativa;
+        else:
+            resultado['gano'] = 1;
+    return jsonify(resultado)
 
 
 if __name__ == '__main__':

@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block head %}
+{{ super() }}
+{% endblock head %}
+{% block content %}
+
+<img src="{{url_for('static', filename='winner.png') }}" />
+<a href="/jugar" type="button" class="btn btn-primary">Jugar de nuevo</a>
+{% endblock content %}
