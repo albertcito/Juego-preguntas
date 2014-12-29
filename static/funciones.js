@@ -2,7 +2,10 @@ $(document).ready(inicio);
 
 function inicio(){
 
-  $("#respuestas a").on( "click", verificaOpcion);
+  $("#respuestas").on( "click","a", verificaOpcion);
+  $("#porciento").click(porciento);
+  $("#otra_pregunta").click(otra_pregunta);
+
 }
 function verificaOpcion(){
  
@@ -16,6 +19,7 @@ function verificaOpcion(){
 
       //si error
       if( data.error[0] == 0 ){
+        //alert("perdio")
         window.location = "/perdio?etapa="+e
         return;
       } 
@@ -26,10 +30,13 @@ function verificaOpcion(){
       }
       
       $('#pregunta').text(data.pregunta)
-      $('#respuestas a:eq(0)').text(data.alternativas[0][0])
-      $('#respuestas a:eq(1)').text(data.alternativas[1][0])
-      $('#respuestas a:eq(2)').text(data.alternativas[2][0])
-      $('#respuestas a:eq(3)').text(data.alternativas[3][0])
+      $('#pregunta').attr('rel',data.id_pregunta)
+      $('#respuestas')
+        .html('')
+        .append('<a  href="javascrip:;" class="btn btn-primary">'+data.alternativas[0][0]+'</a> ')
+        .append('<a  href="javascrip:;" class="btn btn-warning">'+data.alternativas[1][0]+'</a> ')
+        .append('<a  href="javascrip:;" class="btn btn-info">'+data.alternativas[2][0]+'</a> ')
+        .append('<a  href="javascrip:;" class="btn btn-success">'+data.alternativas[3][0]+'</a> ')
 
       $('#etapa li').removeClass('active');
       $('#id_'+data.etapa[2]).addClass('active');
@@ -37,4 +44,42 @@ function verificaOpcion(){
   );
   return false;
 
+}
+
+function porciento(){
+    
+    boton = this.remove();
+    p = $('#pregunta').attr('rel');
+
+    $.getJSON('/_porciento', {
+        id_pregunta: p
+      }, function(data) {
+           $('#respuestas')
+            .html('')
+            .append('<a  href="javascrip:;" class="btn btn-primary">'+data.alternativas[0]+'</a> ')
+            .append('<a  href="javascrip:;" class="btn btn-warning">'+data.alternativas[1]+'</a> ')
+      }
+    );
+}
+
+function otra_pregunta(){
+    boton = this.remove();
+    p = $('#pregunta').attr('rel');
+    e = $('#etapa li.active').attr('rel')
+
+    $.getJSON('/_otra_pregunta', {
+        id_pregunta: p,
+        no_etapa:e
+      }, function(data) {
+           
+          $('#pregunta').text(data.pregunta)
+          $('#pregunta').attr('rel',data.id_pregunta)
+          $('#respuestas')
+            .html('')
+            .append('<a  href="javascrip:;" class="btn btn-primary">'+data.alternativas[0][0]+'</a> ')
+            .append('<a  href="javascrip:;" class="btn btn-warning">'+data.alternativas[1][0]+'</a> ')
+            .append('<a  href="javascrip:;" class="btn btn-info">'+data.alternativas[2][0]+'</a> ')
+            .append('<a  href="javascrip:;" class="btn btn-success">'+data.alternativas[3][0]+'</a> ')
+          }
+    );
 }

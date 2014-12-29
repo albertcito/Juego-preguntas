@@ -5,10 +5,45 @@
 
 {% block content %}
 	
+	<style type="text/css">
+		.bs-glyphicons {
+			margin-right: 0;
+			margin-left: 0;
+		}
+		.bs-glyphicons {
+			margin: 0 -10px 20px;
+			overflow: hidden;
+		}
+		.bs-glyphicons-list {
+			padding-left: 0;
+			list-style: none;
+		}
+		.bs-glyphicons a {
+			display: block;
+			padding: 10px;
+			font-size: 10px;
+			line-height: 1.4;
+			text-align: center;
+			background-color: #f9f9f9;
+			border: 1px solid #fff;
+			text-decoration: none;
+		}
+			.bs-glyphicons a:hover {
+				color: #fff;
+				background-color: #2d6ca2;
+			}
+			.bs-glyphicons a span{display: block;}
+			.bs-glyphicons a span.glyphicon{
+				font-size: 3.4em;
+			}
+			.bs-glyphicons a span.glyphicon-class{
+				margin-top: 10px;
+			}
+	</style>
 	
-	<div class="col-md-9">
+	<div class="col-md-8">
 
-		<h1 id="pregunta">
+		<h1 id="pregunta" rel="{{pregunta[0]}}">
 			{{pregunta[1]}}
 		</h1>
 		<div id="respuestas">
@@ -30,10 +65,34 @@
 		</div>
 
 	</div>
+
+	<div class="col-md-1">
+		<div class="bs-glyphicons">
+			<ul class="bs-glyphicons-list">
+				<li>
+					<a href="javascript:;" id="porciento">
+						<span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
+						<span class="glyphicon-class">
+							Comodín 50%
+						</span>
+		          	</a>
+		        </li>
+		        <li>
+					<a href="javascript:;" id="otra_pregunta">
+						<span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span>
+						<span class="glyphicon-class">
+							Otra Pregunta
+						</span>
+		          	</a>
+		        </li>
+			</ul>
+		</div>
+	</div>
+
 	<div class="col-md-3">
 		<ul class="list-group" id="etapa">
 			{% for e in etapa %}
-				<li id="id_{{ e[2] }}" rel="{{ e[2] }}" class="list-group-item {% if e[1] == 5000 %} active {% endif %}">
+				<li id="id_{{ e[2] }}" rel="{{ e[2] }}" class="list-group-item {% if e[1] == 1000 %} active {% endif %}">
 					<h4 class="list-group-item-heading">{{ e[0] }}</h4>
 					<p class="list-group-item-text">{{ e[1] }}</p>
 				</li>
