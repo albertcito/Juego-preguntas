@@ -1,9 +1,9 @@
-Juego-preguntas
+Juego-preguntas : URL: http://albertcito.pythonanywhere.com/
 ===============
 
 Integrantes:
-- Albert Barrientos | albert.bar@gmail.com
-- Diego Carrera | dcarrerae@outlook.com
+- Albert Barrientos 
+- Diego Carrera 
 
 Librerias utilizadas, todas estan en la carpeta static, así que estan todas en modo local.
 
